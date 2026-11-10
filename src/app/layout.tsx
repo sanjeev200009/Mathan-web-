@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
+// Fonts are self-hosted (src/app/fonts) so the site never waits on Google Fonts.
+// ponytail: Latin characters only; add the other subsets' files if the store needs them.
+
 // Body and UI text: Inter reads cleanly at small sizes (product cards, prices, forms).
-const inter = Inter({
+const inter = localFont({
+  src: "./fonts/Inter.woff2",
+  weight: "100 900",
   variable: "--font-inter",
-  subsets: ["latin"],
   display: "swap",
 });
 
 // Headings, product names, hero text.
-const jakarta = Plus_Jakarta_Sans({
+const jakarta = localFont({
+  src: "./fonts/PlusJakartaSans.woff2",
+  weight: "200 800",
   variable: "--font-jakarta",
-  subsets: ["latin"],
   display: "swap",
 });
 
