@@ -10,6 +10,7 @@ import VeggieBand from "./VeggieBand";
 import SpecialWheel from "./SpecialWheel";
 import WhyChat from "./WhyChat";
 import FarmBanner from "./FarmBanner";
+import SiteFooter from "./SiteFooter";
 
 gsap.registerPlugin(useGSAP);
 
@@ -60,6 +61,7 @@ export default function HeroScene({ t, lang }: { t: Dictionary; lang: Locale }) 
       <SpecialWheel t={t} lang={lang} />
       <WhyChat lang={lang} />
       <FarmBanner t={t} lang={lang} />
+      <SiteFooter t={t} lang={lang} />
     </>
   );
 
