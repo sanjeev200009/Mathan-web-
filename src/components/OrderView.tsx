@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WHATSAPP, type Locale } from "@/app/[lang]/dictionaries";
 import { PRODUCTS, WHEN, addToBasket, clearBasket, orderMessage, phoneOk, rs, setQty, useBasket, whatsappLink, type Details } from "@/lib/shop";
-import Veg from "./Veg";
 import { Stepper } from "./ProductCard";
 
 // The order page (owner, 22 Nov: "another page for the order... check out at the basket and send the
@@ -255,7 +254,8 @@ export default function OrderView({ lang }: { lang: Locale }) {
               <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {PRODUCTS.filter((p) => !items.find((x) => x.product.id === p.id)).map((p) => (
                   <li key={p.id} className="flex items-center gap-2 rounded-[12px] bg-[#f6f7f1] p-2">
-                    <Veg kind={p.kind} className="size-10 shrink-0" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.img} alt="" loading="lazy" className="size-10 shrink-0 rounded-[8px] bg-white object-contain p-0.5" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13.5px] font-bold text-[#1c2a1e]">{p.name[lang]}</span>
                       <span className="block text-[12px] text-[#5b6460]">{rs(p.price)}</span>

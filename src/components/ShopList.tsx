@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { WHATSAPP, type Dictionary, type Locale } from "@/app/[lang]/dictionaries";
-import { GROUPS, GROUP_VEG, PRODUCTS, rs, useBasket, type Group } from "@/lib/shop";
+import { GROUPS, GROUP_IMG, PRODUCTS, rs, useBasket, type Group } from "@/lib/shop";
 import ProductCard from "./ProductCard";
-import Veg, { type VegKind } from "./Veg";
 
 // The shop page (owner, 22 Nov: "click the categories and check out quickly"; then "too minimal... the
 // page doesn't show any detail"). A banner for the group with its vegetables drawn, big category tiles
@@ -76,14 +75,15 @@ const WORDS = {
   },
 };
 
-// The vegetables drawn in each group's banner.
-const BANNER: Record<Group | "all", VegKind[]> = {
-  all: ["tomato", "carrot", "brinjal", "greens", "pumpkin"],
-  local: ["tomato", "onion", "chilli", "brinjal", "beans"],
-  upcountry: ["carrot", "cabbage", "beans", "garlic", "cucumber"],
-  tubers: ["potato", "pumpkin", "garlic", "onion", "carrot"],
-  greens: ["greens", "cabbage", "cucumber", "beans", "chilli"],
-};
+// The hero's leaves, scattered in the banner (owner, 22 Nov: leaves, not drawings). Turned and flipped
+// differently so they read as nature, not a pattern.
+const LEAVES = [
+  { src: "/img/hero/leaf-b.webp", w: 30, x: 6, y: 14, r: -18, f: false },
+  { src: "/img/hero/leaf-a.webp", w: 20, x: 46, y: 4, r: 30, f: true },
+  { src: "/img/hero/leaf-c.webp", w: 24, x: 70, y: 34, r: -8, f: false },
+  { src: "/img/hero/leaf-a.webp", w: 16, x: 30, y: 56, r: -120, f: false },
+  { src: "/img/hero/leaf-c.webp", w: 18, x: 58, y: 62, r: 40, f: true },
+];
 
 export default function ShopList({ t, lang }: { t: Dictionary; lang: Locale }) {
   const w = WORDS[lang];
@@ -134,18 +134,14 @@ export default function ShopList({ t, lang }: { t: Dictionary; lang: Locale }) {
             </p>
           </div>
           <div aria-hidden="true" className="pointer-events-none absolute right-[2%] max-md:bottom-0 max-md:h-[46%] max-md:w-[58%] max-md:opacity-90 md:inset-y-0 md:w-[46%]">
-            {BANNER[type ?? "all"].map((k, i) => (
-              <Veg
-                key={`${type}-${k}-${i}`}
-                kind={k}
-                className="veg-float absolute drop-shadow-[0_14px_18px_rgba(0,0,0,0.25)]"
-                style={{
-                  width: `${[34, 26, 22, 24, 20][i]}%`,
-                  left: `${[8, 44, 72, 30, 62][i]}%`,
-                  top: `${[18, 8, 30, 52, 58][i]}%`,
-                  rotate: `${[-12, 10, -6, 14, -18][i]}deg`,
-                  animationDelay: `${i * 0.4}s`,
-                }}
+            {LEAVES.map((l, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={i}
+                src={l.src}
+                alt=""
+                className="leaf-float absolute drop-shadow-[0_14px_18px_rgba(0,0,0,0.3)]"
+                style={{ width: `${l.w}%`, left: `${l.x}%`, top: `${l.y}%`, rotate: `${l.r}deg`, scale: l.f ? "-1 1" : undefined, animationDelay: `${i * 0.5}s` }}
               />
             ))}
           </div>
@@ -167,8 +163,9 @@ export default function ShopList({ t, lang }: { t: Dictionary; lang: Locale }) {
                     on ? "border-[#4f7047] bg-[#eef3e3]" : "border-[#e8ebe3] bg-white hover:border-[#4f7047]"
                   }`}
                 >
-                  <span className={`flex size-14 shrink-0 items-center justify-center rounded-[14px] ${on ? "bg-white" : "bg-[#f6f7f1]"}`}>
-                    <Veg kind={g ? GROUP_VEG[g] : "pumpkin"} className="size-11 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+                  <span className="size-14 shrink-0 overflow-hidden rounded-[14px] bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={g ? GROUP_IMG[g] : "/img/banner-basket.webp"} alt="" loading="lazy" className="size-full object-cover transition-transform duration-300 group-hover:scale-110" />
                   </span>
                   <span>
                     <span className="block whitespace-nowrap text-[15px] font-bold leading-tight text-[#1c2a1e]">{g ? labels[GROUPS.indexOf(g)] : w.all}</span>
@@ -228,8 +225,9 @@ export default function ShopList({ t, lang }: { t: Dictionary; lang: Locale }) {
         ) : (
           <div className="mt-6 flex flex-col items-center rounded-[22px] border border-dashed border-[#cfd6c5] bg-white px-6 py-14 text-center">
             <div className="flex -space-x-4" aria-hidden="true">
-              {BANNER[type ?? "all"].slice(0, 3).map((k, i) => (
-                <Veg key={k} kind={k} className="veg-float size-20" style={{ animationDelay: `${i * 0.3}s` }} />
+              {LEAVES.slice(0, 3).map((l, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={i} src={l.src} alt="" className="leaf-float w-16" style={{ rotate: `${l.r}deg`, animationDelay: `${i * 0.3}s` }} />
               ))}
             </div>
             <p className="mt-4 text-[20px] font-bold text-[#1c2a1e]">{w.none}</p>
@@ -282,7 +280,8 @@ export default function ShopList({ t, lang }: { t: Dictionary; lang: Locale }) {
       <section className="frame pb-28">
         <div className="flex flex-wrap items-center justify-between gap-5 rounded-[22px] bg-[#e8efda] px-[clamp(20px,3vw,40px)] py-6">
           <div className="flex items-center gap-4">
-            <Veg kind="chilli" className="veg-float size-16 shrink-0" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/img/hero/leaf-c.webp" alt="" aria-hidden="true" className="leaf-float w-16 shrink-0 -rotate-12" />
             <div>
               <p className="text-[19px] font-bold text-[#1c2a1e]">{w.help}</p>
               <p className="mt-1 text-[15px] text-[#444]">{w.helpLine}</p>

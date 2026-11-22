@@ -9,12 +9,16 @@ import { WHATSAPP, type Locale } from "@/app/[lang]/dictionaries";
 
 export type Group = "local" | "upcountry" | "tubers" | "greens";
 export const GROUPS: Group[] = ["local", "upcountry", "tubers", "greens"];
-// The cartoon vegetable that stands for each group (src/components/Veg.tsx).
-export const GROUP_VEG = { local: "tomato", upcountry: "carrot", tubers: "potato", greens: "greens" } as const;
+// The photo that stands for each group (the same as its card in the ribbon section).
+export const GROUP_IMG: Record<Group, string> = {
+  local: "/img/cat-vegetables.webp",
+  upcountry: "/img/banner-basket.webp",
+  tubers: "/img/p-potato.webp",
+  greens: "/img/cat-greens.webp",
+};
 
 type Words = { en: string; ta: string };
 // store = how to keep it, uses = what to cook with it, pairs = what goes with it (product ids),
-// kind = its cartoon drawing in Veg.tsx.
 export type Product = {
   id: string;
   group: Group;
@@ -26,7 +30,6 @@ export type Product = {
   store: Words;
   uses: Words;
   pairs: string[];
-  kind: "tomato" | "onion" | "potato" | "chilli";
 };
 
 export const PRODUCTS: Product[] = [
@@ -41,7 +44,6 @@ export const PRODUCTS: Product[] = [
     store: { en: "Keep at room temperature until fully ripe, then in the fridge for a few more days.", ta: "முழுமையாகப் பழுக்கும் வரை அறை வெப்பநிலையில் வையுங்கள், பிறகு சில நாட்கள் குளிர்சாதனப் பெட்டியில்." },
     uses: { en: "Tomato curry, sambols, salads, rasam and sauces.", ta: "தக்காளிக் கறி, சம்பல், சாலட், ரசம் மற்றும் சோஸ்." },
     pairs: ["red-onion", "green-chilli"],
-    kind: "tomato",
   },
   {
     id: "red-onion",
@@ -54,7 +56,6 @@ export const PRODUCTS: Product[] = [
     store: { en: "Keep in a cool, dry, airy place - away from potatoes, so both last longer.", ta: "குளிர்ந்த, உலர்ந்த, காற்றோட்டமான இடத்தில் வையுங்கள் - உருளைக்கிழங்கிலிருந்து தள்ளி." },
     uses: { en: "The base of curries, sambols, fried rice and tempering.", ta: "கறி, சம்பல், ஃப்ரைட் ரைஸ் மற்றும் தாளிப்புக்கு அடிப்படை." },
     pairs: ["tomato", "potato"],
-    kind: "onion",
   },
   {
     id: "potato",
@@ -67,7 +68,6 @@ export const PRODUCTS: Product[] = [
     store: { en: "Keep in a cool, dark place - not in the fridge, and away from onions.", ta: "குளிர்ந்த, இருண்ட இடத்தில் வையுங்கள் - குளிர்சாதனப் பெட்டியில் அல்ல, வெங்காயத்திலிருந்து தள்ளி." },
     uses: { en: "Potato curry, tempered potatoes, fries and roasts.", ta: "உருளைக்கிழங்குக் கறி, தாளித்த உருளைக்கிழங்கு, பொரியல் மற்றும் வறுவல்." },
     pairs: ["red-onion", "green-chilli"],
-    kind: "potato",
   },
   {
     id: "green-chilli",
@@ -80,7 +80,6 @@ export const PRODUCTS: Product[] = [
     store: { en: "Keep in a paper bag in the fridge; they stay fresh for about a week.", ta: "காகிதப் பையில் குளிர்சாதனப் பெட்டியில் வையுங்கள்; சுமார் ஒரு வாரம் புதிதாக இருக்கும்." },
     uses: { en: "Sambols, curries, tempering and pickles.", ta: "சம்பல், கறி, தாளிப்பு மற்றும் ஊறுகாய்." },
     pairs: ["tomato", "red-onion"],
-    kind: "chilli",
   },
 ];
 

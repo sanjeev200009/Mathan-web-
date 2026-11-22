@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { WHATSAPP, type Dictionary, type Locale } from "@/app/[lang]/dictionaries";
-import { GROUPS, GROUP_VEG, PRODUCTS, rs, useBasket } from "@/lib/shop";
-import Veg from "./Veg";
+import { GROUPS, GROUP_IMG, PRODUCTS, rs, useBasket } from "@/lib/shop";
 
 // The shop's navbar (owner, 22 Nov: "a proper navbar for the e-commerce vegetable selling website").
 // What a vegetable shop's bar must have: the name home, the categories, a search, the language, a quick
@@ -172,7 +171,10 @@ export default function ShopNav({ t, lang, mode }: { t: Dictionary; lang: Locale
                       href={`/${lang}${g.href}`}
                       className="group flex items-center gap-3 rounded-[14px] bg-[#f6f7f1] p-3 transition-colors hover:bg-[#eef3e3]"
                     >
-                      <Veg kind={GROUP_VEG[GROUPS[i]]} className="size-12 shrink-0 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+                      <span className="size-12 shrink-0 overflow-hidden rounded-[12px] bg-white">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={GROUP_IMG[GROUPS[i]]} alt="" loading="lazy" className="size-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                      </span>
                       <span className="min-w-0">
                         <span className="block text-[15px] font-bold leading-tight text-[#1c2a1e]">{g.label}</span>
                         <span className="mt-0.5 block text-[12px] text-[#5b6460]">{n ? w.count(n) : w.soon}</span>

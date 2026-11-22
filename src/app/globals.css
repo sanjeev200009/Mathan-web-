@@ -209,8 +209,8 @@ h1, h2, h3, button, a.rounded-lg {
   30% { transform: translateY(-4px); opacity: 1; }
 }
 
-/* The cartoon vegetables float gently on the shop pages (Veg.tsx). */
-@keyframes veg-float {
+/* The leaves float gently on the shop pages. */
+@keyframes leaf-float {
   0%,
   100% {
     translate: 0 0;
@@ -219,11 +219,11 @@ h1, h2, h3, button, a.rounded-lg {
     translate: 0 -10px;
   }
 }
-.veg-float {
-  animation: veg-float 4.2s ease-in-out infinite;
+.leaf-float {
+  animation: leaf-float 4.2s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .veg-float {
+  .leaf-float {
     animation: none;
   }
 }

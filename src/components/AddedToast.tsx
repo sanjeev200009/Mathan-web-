@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/app/[lang]/dictionaries";
 import { ADDED, productById, rs, useBasket } from "@/lib/shop";
-import Veg from "./Veg";
 
 // The "added" pop-up (owner, 22 Nov: buying must feel easy). Whatever adds to the basket - a card, the
 // hero, the wheel, a product page - shows this for a few seconds: what went in, the basket's total, and a
@@ -46,8 +45,9 @@ export default function AddedToast({ lang }: { lang: Locale }) {
     >
       {p && (
         <div key={shown.n} className="enter flex items-center gap-3 rounded-[18px] border border-black/5 bg-white p-3 pr-4 shadow-[0_24px_60px_-20px_rgba(2,42,9,0.45)]">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-[14px] bg-[#eef3e3]">
-            <Veg kind={p.kind} className="size-11" />
+          <span className="size-14 shrink-0 overflow-hidden rounded-[14px] border border-[#eef0ea] bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={p.img} alt="" className="size-full object-contain p-1" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[12.5px] font-semibold text-[#4f7047]">✓ {w.added}</p>

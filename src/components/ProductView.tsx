@@ -6,7 +6,6 @@ import { useState } from "react";
 import { WHATSAPP, type Dictionary, type Locale } from "@/app/[lang]/dictionaries";
 import { GROUPS, PRODUCTS, addToBasket, productById, rs, useBasket } from "@/lib/shop";
 import ProductCard from "./ProductCard";
-import Veg from "./Veg";
 
 // One vegetable's page (owner, 22 Nov: "the product page is too minimal... doesn't show any detail").
 // Left: the photo with its cartoon twin and a "picked fresh" badge. Right: the price, how many and the
@@ -137,7 +136,8 @@ export default function ProductView({ id, t, lang }: { id: string; t: Dictionary
               <span className="size-2 rounded-full bg-[#4f7047]" />
               {w.fresh}
             </span>
-            <Veg kind={p.kind} className="veg-float absolute -bottom-2 right-4 size-[22%] drop-shadow-[0_12px_16px_rgba(2,42,9,0.2)]" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/img/hero/leaf-a.webp" alt="" aria-hidden="true" className="leaf-float pointer-events-none absolute -bottom-3 right-5 w-[16%] rotate-[24deg] drop-shadow-[0_10px_14px_rgba(2,42,9,0.2)]" />
           </div>
         </div>
 
@@ -243,7 +243,8 @@ export default function ProductView({ id, t, lang }: { id: string; t: Dictionary
             ))}
           </div>
           <div role="tabpanel" className="mt-5 flex items-start gap-5">
-            <Veg kind={p.kind} className="hidden size-20 shrink-0 sm:block" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={p.img} alt="" className="hidden size-20 shrink-0 rounded-[14px] border border-[#eef0ea] object-contain p-1 sm:block" />
             <p key={tab} className="enter max-w-[70ch] text-[17px] leading-[1.7] text-[#444]">
               {tabText[tab]}
             </p>
@@ -275,8 +276,9 @@ export default function ProductView({ id, t, lang }: { id: string; t: Dictionary
             <ul className="mt-6 grid gap-3 sm:grid-cols-3">
               {meal.map((x, i) => (
                 <li key={x.id} className="flex items-center gap-4 rounded-[16px] bg-white/[0.07] p-3">
-                  <span className="flex size-16 shrink-0 items-center justify-center rounded-[12px] bg-white/10">
-                    <Veg kind={x.kind} className="size-12" />
+                  <span className="size-16 shrink-0 overflow-hidden rounded-[12px] bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={x.img} alt="" loading="lazy" className="size-full object-contain p-1.5" />
                   </span>
                   <span className="min-w-0">
                     <Link href={`/${lang}/product/${x.id}/`} className="block font-bold hover:underline">
