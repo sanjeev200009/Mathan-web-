@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { WHATSAPP, type Dictionary, type Locale } from "@/app/[lang]/dictionaries";
-import { rs, useBasket } from "@/lib/shop";
+import { GROUPS, GROUP_VEG, PRODUCTS, rs, useBasket } from "@/lib/shop";
+import Veg from "./Veg";
 
 // The shop's navbar (owner, 22 Nov: "a proper navbar for the e-commerce vegetable selling website").
 // What a vegetable shop's bar must have: the name home, the categories, a search, the language, a quick
@@ -15,8 +16,30 @@ import { rs, useBasket } from "@/lib/shop";
 const OS = '"Open Sans Variable", "Open Sans", "Noto Sans Tamil", system-ui, sans-serif';
 
 export const NAV_WORDS = {
-  en: { shop: "All vegetables", cats: "Categories", search: "Search vegetables", basket: "Basket", empty: "Your basket", whatsapp: "WhatsApp us" },
-  ta: { shop: "அனைத்து காய்கறிகள்", cats: "வகைகள்", search: "காய்கறிகளைத் தேடுங்கள்", basket: "கூடை", empty: "உங்கள் கூடை", whatsapp: "WhatsApp" },
+  en: {
+    shop: "All vegetables",
+    cats: "Categories",
+    search: "Search vegetables",
+    basket: "Basket",
+    empty: "Your basket",
+    whatsapp: "WhatsApp us",
+    count: (n: number) => `${n} ${n === 1 ? "vegetable" : "vegetables"}`,
+    soon: "Coming soon",
+    menuLine: "Picked fresh from local farms",
+    strip: ["Order today, at your door tomorrow", "Cash on delivery", "Fresh from local farms"],
+  },
+  ta: {
+    shop: "அனைத்து காய்கறிகள்",
+    cats: "வகைகள்",
+    search: "காய்கறிகளைத் தேடுங்கள்",
+    basket: "கூடை",
+    empty: "உங்கள் கூடை",
+    whatsapp: "WhatsApp",
+    count: (n: number) => `${n} காய்கறிகள்`,
+    soon: "விரைவில்",
+    menuLine: "உள்ளூர் தோட்டங்களிலிருந்து புதிதாக",
+    strip: ["இன்று ஆர்டர், நாளை உங்கள் கதவில்", "பொருள் வந்த பிறகே பணம்", "உள்ளூர் தோட்டங்களிலிருந்து புதிதாக"],
+  },
 };
 
 function Leaf({ className }: { className?: string }) {
@@ -82,6 +105,23 @@ export default function ShopNav({ t, lang, mode }: { t: Dictionary; lang: Locale
 
   return (
     <header ref={bar} className={wrap} style={{ fontFamily: OS }} aria-hidden={mode === "float" && !shown ? true : undefined}>
+      {mode === "page" && (
+        <div className="bg-[#022a09] text-[12.5px] text-white/80">
+          <div className="frame flex h-9 items-center justify-center gap-x-8 sm:justify-between">
+            <ul className="flex items-center gap-x-6">
+              {w.strip.map((x, i) => (
+                <li key={x} className={`flex items-center gap-2 ${i ? "max-lg:hidden" : ""}`}>
+                  <span className="size-1.5 rounded-full bg-[#cbec4b]" />
+                  {x}
+                </li>
+              ))}
+            </ul>
+            <a href={WHATSAPP.href} target="_blank" rel="noopener" className="font-semibold text-[#cbec4b] hover:underline max-sm:hidden">
+              WhatsApp {WHATSAPP.label}
+            </a>
+          </div>
+        </div>
+      )}
       <nav aria-label="Main" className={`frame flex items-center gap-4 ${mode === "hero" ? "h-full" : "h-[68px]"}`}>
         <Link href={`/${lang}`} className="flex shrink-0 items-center gap-2.5">
           <span className="flex size-9 items-center justify-center rounded-full bg-[#4f7047] text-[#cbec4b]">
@@ -121,20 +161,33 @@ export default function ShopNav({ t, lang, mode }: { t: Dictionary; lang: Locale
             {w.shop}
           </Link>
           {menu && (
-            <ul className="absolute left-0 top-12 z-50 w-64 rounded-[14px] border border-black/5 bg-white p-2 shadow-[0_20px_50px_-20px_rgba(2,42,9,0.35)]">
-              <li>
-                <Link onClick={() => setMenu(false)} href={`/${lang}/vegetables/`} className="block rounded-[10px] px-3 py-2.5 text-[15px] font-semibold text-[#1c2a1e] hover:bg-[#eef3e3]">
-                  {w.shop}
+            <div className="absolute left-0 top-12 z-50 w-[min(92vw,520px)] rounded-[18px] border border-black/5 bg-white p-3 shadow-[0_30px_60px_-24px_rgba(2,42,9,0.4)]">
+              <div className="grid grid-cols-2 gap-2">
+                {groups.map((g, i) => {
+                  const n = PRODUCTS.filter((p) => p.group === GROUPS[i]).length;
+                  return (
+                    <Link
+                      key={g.href}
+                      onClick={() => setMenu(false)}
+                      href={`/${lang}${g.href}`}
+                      className="group flex items-center gap-3 rounded-[14px] bg-[#f6f7f1] p-3 transition-colors hover:bg-[#eef3e3]"
+                    >
+                      <Veg kind={GROUP_VEG[GROUPS[i]]} className="size-12 shrink-0 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+                      <span className="min-w-0">
+                        <span className="block text-[15px] font-bold leading-tight text-[#1c2a1e]">{g.label}</span>
+                        <span className="mt-0.5 block text-[12px] text-[#5b6460]">{n ? w.count(n) : w.soon}</span>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-3 rounded-[14px] bg-[#022a09] px-4 py-3 text-white">
+                <span className="text-[13px] text-white/75">{w.menuLine}</span>
+                <Link onClick={() => setMenu(false)} href={`/${lang}/vegetables/`} className="shrink-0 text-[14px] font-semibold text-[#cbec4b] hover:underline">
+                  {w.shop} →
                 </Link>
-              </li>
-              {groups.map((g) => (
-                <li key={g.href}>
-                  <Link onClick={() => setMenu(false)} href={`/${lang}${g.href}`} className="block rounded-[10px] px-3 py-2.5 text-[15px] text-[#444] hover:bg-[#eef3e3]">
-                    {g.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+              </div>
+            </div>
           )}
         </div>
 

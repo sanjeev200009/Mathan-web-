@@ -208,3 +208,22 @@ h1, h2, h3, button, a.rounded-lg {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
   30% { transform: translateY(-4px); opacity: 1; }
 }
+
+/* The cartoon vegetables float gently on the shop pages (Veg.tsx). */
+@keyframes veg-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+.veg-float {
+  animation: veg-float 4.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .veg-float {
+    animation: none;
+  }
+}

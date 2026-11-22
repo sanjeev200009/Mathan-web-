@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Locale } from "@/app/[lang]/dictionaries";
-import { clearBasket, orderMessage, phoneOk, rs, setQty, useBasket, whatsappLink, type Details } from "@/lib/shop";
+import { WHATSAPP, type Locale } from "@/app/[lang]/dictionaries";
+import { PRODUCTS, WHEN, addToBasket, clearBasket, orderMessage, phoneOk, rs, setQty, useBasket, whatsappLink, type Details } from "@/lib/shop";
+import Veg from "./Veg";
 import { Stepper } from "./ProductCard";
 
 // The order page (owner, 22 Nov: "another page for the order... check out at the basket and send the
@@ -44,6 +45,14 @@ const WORDS = {
     again: "Open WhatsApp again",
     done: "Done - empty my basket",
     more: "Keep shopping",
+    steps: ["Basket", "Your details", "Send on WhatsApp"],
+    addMore: "Add more to your order",
+    add: "Add",
+    when: "Preferred delivery time",
+    whenNote: "We confirm the exact time on WhatsApp.",
+    any: "Any time",
+    help: "Need help? Message us on WhatsApp",
+    trust: ["Fresh from local farms", "Delivered tomorrow in Colombo", "Pay when it arrives"],
   },
   ta: {
     title: "உங்கள் ஆர்டர்",
@@ -74,10 +83,18 @@ const WORDS = {
     again: "WhatsApp-ஐ மீண்டும் திற",
     done: "முடிந்தது - கூடையை காலி செய்",
     more: "தொடர்ந்து வாங்க",
+    steps: ["கூடை", "உங்கள் விவரங்கள்", "WhatsApp-இல் அனுப்பு"],
+    addMore: "உங்கள் ஆர்டரில் மேலும் சேருங்கள்",
+    add: "சேர்",
+    when: "விருப்பமான விநியோக நேரம்",
+    whenNote: "சரியான நேரத்தை WhatsApp-இல் உறுதிப்படுத்துவோம்.",
+    any: "எந்த நேரமும்",
+    help: "உதவி வேண்டுமா? WhatsApp-இல் எழுதுங்கள்",
+    trust: ["உள்ளூர் தோட்டங்களிலிருந்து புதிதாக", "நாளை கொழும்பில் விநியோகம்", "வந்ததும் பணம்"],
   },
 };
 
-const BLANK: Details = { name: "", phone: "", how: "delivery", address: "", area: "", notes: "" };
+const BLANK: Details = { name: "", phone: "", how: "delivery", address: "", area: "", when: "", notes: "" };
 
 export default function OrderView({ lang }: { lang: Locale }) {
   const w = WORDS[lang];
@@ -169,7 +186,24 @@ export default function OrderView({ lang }: { lang: Locale }) {
 
   return (
     <section className="frame pb-24 pt-[clamp(28px,5vh,56px)]" style={{ fontFamily: OS }}>
-      <h1 className="text-[clamp(30px,3.4vw,52px)] font-bold tracking-[-0.02em] text-[#1c2a1e]">{w.title}</h1>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="text-[clamp(30px,3.4vw,52px)] font-bold tracking-[-0.02em] text-[#1c2a1e]">{w.title}</h1>
+        <ol className="flex items-center gap-2 text-[13px] font-semibold">
+          {w.steps.map((x, i) => (
+            <li key={x} className="flex items-center gap-2">
+              <span
+                className={`flex size-7 items-center justify-center rounded-full ${
+                  i === 0 ? "bg-[#4f7047] text-white" : i === 1 ? "bg-[#cbec4b] text-[#022a09]" : "border border-[#cfd6c5] text-[#5b6460]"
+                }`}
+              >
+                {i === 0 ? "✓" : i + 1}
+              </span>
+              <span className={i === 1 ? "text-[#1c2a1e]" : "text-[#5b6460] max-sm:hidden"}>{x}</span>
+              {i < 2 && <span aria-hidden="true" className="h-px w-6 bg-[#cfd6c5]" />}
+            </li>
+          ))}
+        </ol>
+      </div>
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-10">
         {/* The basket */}
         <div className="rounded-[20px] border border-[#e8ebe3] bg-white p-[clamp(16px,2vw,28px)]">
@@ -215,6 +249,25 @@ export default function OrderView({ lang }: { lang: Locale }) {
               <dd className="tabular-nums">{rs(total)}</dd>
             </div>
           </dl>
+          {PRODUCTS.some((p) => !items.find((x) => x.product.id === p.id)) && (
+            <div className="mt-6 border-t border-[#eef0ea] pt-5">
+              <h3 className="text-[15px] font-bold text-[#1c2a1e]">{w.addMore}</h3>
+              <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {PRODUCTS.filter((p) => !items.find((x) => x.product.id === p.id)).map((p) => (
+                  <li key={p.id} className="flex items-center gap-2 rounded-[12px] bg-[#f6f7f1] p-2">
+                    <Veg kind={p.kind} className="size-10 shrink-0" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13.5px] font-bold text-[#1c2a1e]">{p.name[lang]}</span>
+                      <span className="block text-[12px] text-[#5b6460]">{rs(p.price)}</span>
+                    </span>
+                    <button type="button" onClick={() => addToBasket(p.id)} aria-label={`${w.add} ${p.name[lang]}`} className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-[#4f7047] text-[18px] text-white hover:bg-[#3d5a37]">
+                      +
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* The details and the send */}
@@ -267,6 +320,25 @@ export default function OrderView({ lang }: { lang: Locale }) {
                 </label>
               </>
             )}
+            {d.how === "delivery" && (
+              <fieldset>
+                <legend className={label}>{w.when}</legend>
+                <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {(["", "morning", "afternoon", "evening"] as const).map((k) => (
+                    <label
+                      key={k || "any"}
+                      className={`flex cursor-pointer items-center justify-center rounded-[10px] border px-2 py-2.5 text-center text-[13.5px] font-semibold transition-colors ${
+                        d.when === k ? "border-[#4f7047] bg-[#eef3e3] text-[#1c2a1e]" : "border-[#dbdee5] text-[#444] hover:border-[#4f7047]"
+                      }`}
+                    >
+                      <input type="radio" name="when" checked={d.when === k} onChange={() => put("when", k)} className="sr-only" />
+                      {k ? WHEN[lang][k] : w.any}
+                    </label>
+                  ))}
+                </div>
+                <span className="mt-1 block text-[13px] text-[#999fa6]">{w.whenNote}</span>
+              </fieldset>
+            )}
             <label className={label}>
               {w.notes}
               <textarea value={d.notes} onChange={(e) => put("notes", e.target.value)} rows={2} className={`${input("notes")} h-auto py-3`} />
@@ -281,6 +353,17 @@ export default function OrderView({ lang }: { lang: Locale }) {
             <img src="/icons/whatsapp.svg" alt="" className="size-5 brightness-0 invert" />
             {w.send} · {rs(total)}
           </button>
+          <ul className="mt-4 space-y-1.5">
+            {w.trust.map((x) => (
+              <li key={x} className="flex items-center gap-2 text-[13px] text-[#5b6460]">
+                <span className="text-[#4f7047]">✓</span>
+                {x}
+              </li>
+            ))}
+          </ul>
+          <a href={WHATSAPP.href} target="_blank" rel="noopener" className="mt-4 block text-center text-[13.5px] font-semibold text-[#4f7047] underline">
+            {w.help}
+          </a>
         </form>
       </div>
     </section>

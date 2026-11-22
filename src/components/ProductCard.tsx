@@ -29,7 +29,7 @@ export function Stepper({ id, qty, lang, big, wide }: { id: string; qty: number;
   );
 }
 
-export default function ProductCard({ p, lang }: { p: Product; lang: Locale }) {
+export default function ProductCard({ p, lang, group }: { p: Product; lang: Locale; group?: string }) {
   const { lines } = useBasket();
   const qty = lines[p.id] ?? 0;
   const href = `/${lang}/product/${p.id}/`;
@@ -45,6 +45,7 @@ export default function ProductCard({ p, lang }: { p: Product; lang: Locale }) {
         )}
       </Link>
       <div className="flex flex-1 flex-col p-4">
+        {group && <p className="mb-1 text-[11.5px] font-semibold uppercase tracking-[0.08em] text-[#4f7047]">{group}</p>}
         <Link href={href} className="text-[17px] font-bold leading-tight text-[#1c2a1e] hover:underline">
           {p.name[lang]}
         </Link>

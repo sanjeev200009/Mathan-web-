@@ -5,6 +5,7 @@ import { getDictionary, hasLocale, LOCALES } from "./dictionaries";
 import "../globals.css";
 import "lenis/dist/lenis.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import AddedToast from "@/components/AddedToast";
 
 // Fonts are self-hosted (src/app/fonts) so the site never waits on Google Fonts.
 const inter = localFont({
@@ -49,6 +50,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         {/* Only the preloader is shown (21 Nov). The top bar (VNav) and cart (CartProvider) are kept
             on disk, unused, for when the sections come back. */}
         <SmoothScroll />
+        <AddedToast lang={lang} />
         {children}
       </body>
     </html>

@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Dictionary, Locale } from "@/app/[lang]/dictionaries";
+import Veg, { type VegKind } from "./Veg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -89,20 +90,26 @@ const TILT = [-4, 5, -5, 4, -3, 3]; // each card leans a little, as if hung on t
 // The things behind the ribbon (owner, 22 Nov: the section felt empty): the hero's own leaves and the
 // shop's vegetables, scattered between the cards so the whole flow sits in a field of produce. Places are
 // parts of the section's width and height; s = width as a part of the section's width; d = depth (how far
-// it drifts against the scroll, so near ones move more); veg = a photo on white, blended into the ground.
-const DECOR = [
+// it drifts against the scroll, so near ones move more). Vegetables are the cartoon set in Veg.tsx (owner,
+// 22 Nov: the photos looked pasted in; "a cartoon type of touch, without background").
+const DECOR: { src?: string; kind?: VegKind; x: number; y: number; s: number; r: number; d: number }[] = [
   { src: "/img/hero/leaf-a.webp", x: 0.04, y: 0.1, s: 0.07, r: -30, d: 1.2 },
-  { src: "/img/p-tomato.webp", x: 0.42, y: 0.25, s: 0.085, r: 8, d: 0.6, veg: true },
-  { src: "/img/hero/leaf-c.webp", x: 0.93, y: 0.3, s: 0.075, r: 20, d: 1.4 },
-  { src: "/img/p-onion.webp", x: 0.5, y: 0.42, s: 0.075, r: -12, d: 0.8, veg: true },
-  { src: "/img/hero/leaf-b.webp", x: 0.05, y: 0.49, s: 0.085, r: 15, d: 1.1 },
-  { src: "/img/p-chilli.webp", x: 0.47, y: 0.575, s: 0.1, r: 30, d: 0.5, veg: true },
-  { src: "/img/hero/leaf-a.webp", x: 0.95, y: 0.64, s: 0.06, r: 140, d: 1.3 },
-  { src: "/img/p-potato.webp", x: 0.5, y: 0.71, s: 0.075, r: -8, d: 0.7, veg: true },
-  { src: "/img/hero/leaf-c.webp", x: 0.04, y: 0.8, s: 0.075, r: -40, d: 1.2 },
-  { src: "/img/p-tomato.webp", x: 0.55, y: 0.865, s: 0.065, r: -20, d: 0.9, veg: true },
-  { src: "/img/hero/leaf-b.webp", x: 0.9, y: 0.94, s: 0.075, r: 60, d: 1.1 },
-];
+  { kind: "tomato", x: 0.43, y: 0.2, s: 0.075, r: -10, d: 0.7 },
+  { kind: "carrot", x: 0.95, y: 0.26, s: 0.07, r: 25, d: 1.3 },
+  { src: "/img/hero/leaf-c.webp", x: 0.55, y: 0.31, s: 0.06, r: 20, d: 1.4 },
+  { kind: "onion", x: 0.47, y: 0.41, s: 0.07, r: 12, d: 0.8 },
+  { kind: "brinjal", x: 0.05, y: 0.44, s: 0.075, r: -20, d: 1.1 },
+  { src: "/img/hero/leaf-b.webp", x: 0.93, y: 0.47, s: 0.075, r: 15, d: 1.2 },
+  { kind: "chilli", x: 0.52, y: 0.55, s: 0.08, r: 10, d: 0.6 },
+  { kind: "garlic", x: 0.06, y: 0.6, s: 0.06, r: 8, d: 1.3 },
+  { kind: "cabbage", x: 0.95, y: 0.66, s: 0.075, r: -6, d: 0.9 },
+  { kind: "potato", x: 0.46, y: 0.7, s: 0.07, r: -12, d: 0.7 },
+  { src: "/img/hero/leaf-a.webp", x: 0.04, y: 0.74, s: 0.055, r: 140, d: 1.3 },
+  { kind: "pumpkin", x: 0.55, y: 0.83, s: 0.075, r: 6, d: 0.9 },
+  { kind: "greens", x: 0.05, y: 0.9, s: 0.07, r: -8, d: 1.2 },
+  { kind: "beans", x: 0.93, y: 0.86, s: 0.07, r: 30, d: 1.1 },
+  { kind: "cucumber", x: 0.6, y: 0.96, s: 0.07, r: -18, d: 1.0 },
+]
 
 // Where the ribbon goes, as parts of the section's width and height. Stops 1-6 hold the cards:
 // farmer, the four groups, the shop link. The first and last points are off screen.
@@ -298,8 +305,8 @@ export default function FarmBanner({
       // depth, so the field has layers; and each sways a little on its own.
       sec.querySelectorAll<HTMLElement>(".js-decor").forEach((el, i) => {
         const y = Number(el.dataset.y);
-        tl.to(el, { scale: 1, opacity: 1, duration: 0.07, ease: "back.out(2)" }, HOLD + Math.max(0, y - 0.12));
-        tl.to(el, { y: -Number(el.dataset.d) * H * 0.08, duration: 1 }, HOLD);
+        tl.fromTo(el, { scale: 0, opacity: 0, rotation: i % 2 ? -40 : 40 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.08, ease: "back.out(2.6)" }, HOLD + Math.max(0, y - 0.12));
+        tl.to(el, { y: -Number(el.dataset.d) * H * 0.1, duration: 1 }, HOLD);
         gsap.to(el.firstElementChild, { y: -10, rotation: i % 2 ? 6 : -6, duration: 2.6 + (i % 4) * 0.4, ease: "sine.inOut", yoyo: true, repeat: -1 });
       });
       cards.forEach((card, i) => {
@@ -441,17 +448,21 @@ export default function FarmBanner({
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
             {DECOR.map((o, i) => {
               const x = phone ? (o.x < 0.5 ? 0.06 : 0.94) : o.x;
-              const size = dim.w * (phone ? Math.min(0.17, o.s * 1.9) : o.s);
+              const size = dim.w * (phone ? Math.min(0.18, o.s * 2) : o.s * 1.25);
               return (
                 <div
                   key={i}
-                  className={`js-decor absolute ${o.veg ? "mix-blend-multiply" : ""}`}
+                  className="js-decor absolute"
                   data-y={o.y}
                   data-d={o.d}
                   style={{ left: x * dim.w - size / 2, top: o.y * H - size / 2, width: size, rotate: `${o.r}deg` }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={o.src} alt="" loading="lazy" decoding="async" className={`block w-full ${o.veg ? "" : "opacity-90 drop-shadow-[0_8px_14px_rgba(2,42,9,0.18)]"}`} />
+                  {o.kind ? (
+                    <Veg kind={o.kind} className="block w-full drop-shadow-[0_10px_14px_rgba(2,42,9,0.15)]" />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={o.src} alt="" loading="lazy" decoding="async" className="block w-full opacity-90 drop-shadow-[0_8px_14px_rgba(2,42,9,0.18)]" />
+                  )}
                 </div>
               );
             })}

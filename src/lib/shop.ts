@@ -47,7 +47,10 @@ export function setQty(id: string, qty: number) {
 export function addToBasket(id: string, qty = 1) {
   load();
   setQty(id, (lines[id] ?? 0) + qty);
+  // Tell the page, so the "added" pop-up can show (AddedToast).
+  window.dispatchEvent(new CustomEvent(ADDED, { detail: { id, qty } }));
 }
+export const ADDED = "pasumai:added";
 
 export const clearBasket = () => save({});
 
