@@ -1,34 +1,210 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter-tight/wght.css";
+@import "@fontsource-variable/bricolage-grotesque/index.css";
+@import "@fontsource-variable/dm-sans/index.css";
+@import "@fontsource-variable/open-sans/index.css";
+@import "@fontsource/abhaya-libre/800.css";
+@import "@fontsource/instrument-serif/latin-400-italic.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+  Pasumai Fresh, after the owner's reference (a natural-supplement landing page, 10 Nov 2026):
+  a white page, near-black type set very large, deep forest-green pill buttons, small green dots,
+  real produce photographs on a pale panel, and a band of grass where the reference has moss.
+*/
+@custom-variant lang-ta (&:lang(ta));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  /* font-sans = body/UI (Inter), font-display = headings (Plus Jakarta Sans) */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-}
+  --color-ground: #ffffff;
+  --color-panel: #f3f4f1; /* behind the produce photograph */
+  --color-ink: #141714;
+  --color-muted: #5d625d;
+  --color-line: rgb(20 23 20 / 0.1);
+  --color-forest: #1e3a26; /* buttons and the cart: white on it is 12:1 */
+  --color-leaf: #2f8a4e; /* the small dots only, never text */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* The Verdantix-style palette (owner, 21 Nov): lime accent, deep forest, near-black green. */
+  --color-lime: #cbec4b;
+  --color-deep: #034f10;
+  --color-night: #022a09;
+  --color-mist: #f5f5f5;
+  --font-display: "Bricolage Grotesque Variable", var(--font-tamil), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: "Instrument Serif", "Times New Roman", serif;
+
+  /* Latin letters from Inter; Tamil letters fall through to Noto Sans Tamil. */
+  --font-sans: "Inter Tight Variable", var(--font-inter), var(--font-tamil), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-ground);
+  color: var(--color-ink);
 }
 
-h1,
-h2,
-h3,
-h4 {
+/* The page's one content width: 1280 wide, equal edges both sides. */
+@utility wrap {
+  width: min(1280px, 100% - 32px);
+  margin-inline: auto;
+  @variant md {
+    width: min(1280px, 100% - 80px);
+  }
+}
+
+/* The one frame the home page's three parts share (owner, 22 Nov: "align it properly"): the design's 90px
+   side margin at 1440 (6.25%), never under 20px or over 90px, and at most 1600px wide. SpecialWheel.tsx
+   works out the same numbers in script. */
+@utility frame {
+  width: min(1600px, 100% - 2 * clamp(20px, 6.25vw, 90px));
+  margin-inline: auto;
+}
+
+/* The reference's very large, tight headline. Tamil words are long, so Tamil sets smaller and looser.
+   It also follows the screen's height (svh), so the hero card fits the first view on short laptops. */
+@utility display {
+  font-weight: 500;
+  font-size: clamp(42px, min(5.6vw, 8.5svh), 84px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  &:lang(ta) {
+    font-size: clamp(32px, min(3.9vw, 6svh), 58px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* The one entrance on load: the hero rises 8px and fades in, once. */
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@utility enter {
+  animation: enter 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* A row that scrolls by itself forever (owner, 12 Nov; kept on the category cards 16 Nov: "i need
+   scroll"). The row holds one loop three times and moves by exactly one loop (a third), so it has no
+   seam and no empty end. Items carry their own right margin, never a flex gap, or the copies differ
+   by a gap and the loop jumps. Paused while the pointer is on it. */
+@keyframes marquee {
+  to {
+    transform: translateX(calc(-100% / 3));
+  }
+}
+@utility marquee {
+  width: max-content;
+  animation: marquee var(--marquee-time, 40s) linear infinite;
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}
+
+/* The italic serif word inside a headline (the reference's "Generations"). Tamil has no italic serif,
+   so it keeps the Tamil face and takes the lime or green colour only. */
+.accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.accent:lang(ta) {
+  font-family: var(--font-tamil), sans-serif;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Section headline of the new pages. */
+@utility h2x {
+  font-size: clamp(34px, 4.6vw, 64px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  &:lang(ta) {
+    font-size: clamp(28px, 3.4vw, 46px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* The small pill label above a headline. */
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Hidden until the opening scene has finished, so the bar does not sit on the preloader. */
+html:not([data-intro="done"]) #site-nav {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-12px);
+}
+#site-nav {
+  transition: opacity 500ms var(--ease-ui), transform 500ms var(--ease-ui), background-color 300ms, backdrop-filter 300ms;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes pop {
+  0% { transform: scale(0.4); }
+  70% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* Scroll reveals: hidden only after the page script has switched .motion on, shown by SiteMotion
+   adding .in when the part comes into view. Without the script (or with reduced motion) nothing hides. */
+.motion [data-reveal],
+.motion [data-stagger] > * {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 800ms var(--ease-ui), transform 800ms var(--ease-ui);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.motion [data-reveal].in,
+.motion [data-stagger].in > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* Headlines and buttons use Bricolage Grotesque (a friendlier face than the usual UI grotesque). */
+h1, h2, h3, button, a.rounded-lg {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+}
+
+/* WhatsApp chat (WhyChat.tsx): a message pops in from its corner; the "typing" dots rise in turn. */
+@keyframes bubble {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+}
+.bubble {
+  animation: bubble 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
 }
