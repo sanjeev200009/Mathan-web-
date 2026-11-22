@@ -249,9 +249,13 @@ export default function FarmBanner({
       // The tip's height jumps about (flat on the sideways stretches, fast on the downward ones), so the
       // camera eases toward it instead of copying it: a steady glide, never a stop-start.
       const camY = gsap.quickTo(st, "y", { duration: 1.1, ease: "power3.out" });
+      // The view holds still until the tip passes the line it follows: the ribbon starts lower on the page
+      // than that line on a short window, and following at once pushed the heading under the section above
+      // before anyone had scrolled (owner's screenshot, 22 Nov, 860px wide).
+      const line = Math.max(vh * 0.58, path.getPointAtLength(0).y);
       const follow = (p: number) => {
         const tip = path.getPointAtLength(L * p);
-        camY(gsap.utils.clamp(lowest, 0, vh * 0.58 - tip.y));
+        camY(gsap.utils.clamp(lowest, 0, line - tip.y));
       };
       const draw = { p: 0 };
       const HOLD = 0.06; // a short still moment first, to read the heading
