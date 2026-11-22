@@ -1,7 +1,9 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { WHATSAPP } from "@/app/[lang]/dictionaries";
+import { useLayoutEffect, useRef, useState } from "react";
+import { WHATSAPP, type Dictionary, type Locale } from "@/app/[lang]/dictionaries";
+import { addToBasket } from "@/lib/shop";
+import ShopNav from "./ShopNav";
 
 // The hero, after the owner's Figma frame "Hero" (1440 x 990), read from the .fig file.
 // 22 Nov: it is a real layout now, not a scaled picture of the frame, so it fills the screen at every size:
@@ -24,14 +26,6 @@ const LEAF_X = 40; // where the leaf starts inside the picture side, in design p
 
 const mx = (a: number, b: number, c: number, d: number, e: number, f: number) => `matrix(${a},${b},${c},${d},${e},${f})`;
 
-function Icon({ children }: { children: ReactNode }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="#040404" aria-hidden="true">
-      {children}
-    </svg>
-  );
-}
-
 // The design's slanted button: its own vector, mirrored for the green one.
 function Slant({ flip, fill }: { flip?: boolean; fill: string }) {
   return (
@@ -43,9 +37,10 @@ function Slant({ flip, fill }: { flip?: boolean; fill: string }) {
   );
 }
 
-export default function PixelHero() {
+export default function PixelHero({ t, lang }: { t: Dictionary; lang: Locale }) {
   const box = useRef<HTMLElement>(null);
-  const nav = useRef<HTMLElement>(null);
+  const nav = useRef<HTMLDivElement>(null);
+  const [weight, setWeight] = useState(1); // the hero's 1 kg / 2 kg choice, for its Add to cart
   const words = useRef<HTMLDivElement>(null);
   const [k, setK] = useState(0);
   const [wide, setWide] = useState(true);
@@ -79,33 +74,10 @@ export default function PixelHero() {
 
   return (
     <header ref={box} className="relative isolate overflow-hidden bg-white pb-10 lg:h-svh lg:min-h-[600px] lg:pb-0" style={{ fontFamily: DM }}>
-      {/* Nav */}
-      <nav ref={nav} aria-label="Main" className="frame relative z-20 grid grid-cols-[1fr_auto] items-center lg:grid-cols-[1fr_auto_1fr]" style={{ height: navH }}>
-        <a href="#top" className="text-[17px] font-bold uppercase leading-[22px] text-black">
-          Pasumai Fresh
-        </a>
-        <ul className="hidden items-start gap-[42px] text-[17px] leading-[22px] text-black lg:flex">
-          {[["products", "#products"], ["story", "#story"], ["vegetables", "#products"], ["delivery", "#delivery"], ["contact", "#contact"]].map(([label, href], i) => (
-            <li key={label} className="relative">
-              <a href={href} className="hover:opacity-60">
-                {label}
-              </a>
-              {i === 0 && <span aria-hidden="true" className="absolute inset-x-0 top-[29px] h-[2px] bg-black" />}
-            </li>
-          ))}
-        </ul>
-        <div className="flex items-center gap-[25px] justify-self-end">
-          <Icon><path transform="translate(2 2)" d="M15.87 14.81 C17.20 13.24 18.00 11.22 18.00 9.00 C18.00 4.03 13.97 0.00 9.00 0.00 C4.03 0.00 0.00 4.03 0.00 9.00 C0.00 13.97 4.03 18.00 9.00 18.00 C11.22 18.00 13.24 17.20 14.81 15.87 L17.47 18.53 C17.76 18.82 18.24 18.82 18.53 18.53 C18.82 18.24 18.82 17.76 18.53 17.47 L15.87 14.81 Z M16.50 9.00 C16.50 13.14 13.14 16.50 9.00 16.50 C4.86 16.50 1.50 13.14 1.50 9.00 C1.50 4.86 4.86 1.50 9.00 1.50 C13.14 1.50 16.50 4.86 16.50 9.00 Z" /></Icon>
-          <Icon>
-            <path transform="translate(2.2 2)" d="M3.55 4.98 L7.94 0.76 C9.01 -0.25 10.69 -0.25 11.75 0.76 L16.15 4.98 L18.69 4.98 C19.30 4.98 19.77 5.52 19.68 6.12 L18.22 16.40 C18.00 17.88 16.74 18.98 15.25 18.98 L4.45 18.98 C2.96 18.98 1.69 17.88 1.48 16.40 L0.01 6.12 C-0.08 5.52 0.39 4.98 1.00 4.98 L3.55 4.98 Z M8.98 1.85 C9.47 1.38 10.23 1.38 10.71 1.85 L13.98 4.98 L5.71 4.98 L8.98 1.85 Z M1.58 6.48 L2.96 16.19 C3.07 16.93 3.70 17.48 4.45 17.48 L15.25 17.48 C15.99 17.48 16.62 16.93 16.73 16.19 L18.12 6.48 L1.58 6.48 Z" />
-            {[7.2, 11.2, 15.2].map((x) => <path key={x} transform={`translate(${x} 11.2)`} d="M0.75 0.00 C1.16 0.00 1.50 0.34 1.50 0.75 L1.50 4.75 C1.50 5.16 1.16 5.50 0.75 5.50 C0.34 5.50 0.00 5.16 0.00 4.75 L0.00 0.75 C0.00 0.34 0.34 0.00 0.75 0.00 Z" />)}
-          </Icon>
-          <Icon>
-            <path transform="translate(7 2)" d="M5.00 8.50 C6.93 8.50 8.50 6.93 8.50 5.00 C8.50 3.07 6.93 1.50 5.00 1.50 C3.07 1.50 1.50 3.07 1.50 5.00 C1.50 6.93 3.07 8.50 5.00 8.50 Z M5.00 10.00 C7.76 10.00 10.00 7.76 10.00 5.00 C10.00 2.24 7.76 0.00 5.00 0.00 C2.24 0.00 0.00 2.24 0.00 5.00 C0.00 7.76 2.24 10.00 5.00 10.00 Z" />
-            <path transform="translate(3.2 14.2)" d="M5.75 1.50 C3.40 1.50 1.50 3.40 1.50 5.75 L1.50 6.75 C1.50 7.16 1.16 7.50 0.75 7.50 C0.34 7.50 0.00 7.16 0.00 6.75 L0.00 5.75 C0.00 2.57 2.57 0.00 5.75 0.00 L11.75 0.00 C14.93 0.00 17.50 2.57 17.50 5.75 L17.50 6.75 C17.50 7.16 17.16 7.50 16.75 7.50 C16.34 7.50 16.00 7.16 16.00 6.75 L16.00 5.75 C16.00 3.40 14.10 1.50 11.75 1.50 L5.75 1.50 Z" />
-          </Icon>
-        </div>
-      </nav>
+      {/* Nav: the shop's navbar (owner, 22 Nov), in the place and height of the design's */}
+      <div ref={nav} className="relative z-30" style={{ height: navH }}>
+        <ShopNav t={t} lang={lang} mode="hero" />
+      </div>
 
       {/* The words */}
       <div ref={words} className="frame relative z-10 pt-6 lg:flex lg:h-[calc(100%-clamp(64px,11vh,104px))] lg:flex-col lg:items-start lg:justify-center lg:pb-[clamp(56px,10vh,110px)] lg:pt-0">
@@ -130,7 +102,7 @@ export default function PixelHero() {
               <div className="mt-[7px] flex gap-[30px] pl-[2px]">
                 {["1 kg", "2 kg"].map((label, i) => (
                   <label key={label} className="flex cursor-pointer items-center gap-[11px] text-[16px] leading-[28px] text-black">
-                    <input type="radio" name="hero-weight" defaultChecked={i === 0} className="peer sr-only" />
+                    <input type="radio" name="hero-weight" checked={weight === i + 1} onChange={() => setWeight(i + 1)} className="peer sr-only" />
                     <span aria-hidden="true" className="size-[19px] rounded-full border-2 border-[#dbdee5] peer-checked:border-[6px] peer-checked:border-[#4f7047] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#4f7047]" />
                     {label}
                   </label>
@@ -138,10 +110,10 @@ export default function PixelHero() {
               </div>
             </fieldset>
             <div className="mt-[clamp(18px,5vh,51px)] flex" style={{ height: bh }}>
-              <a href="#products" className="relative flex h-full items-center justify-center text-[clamp(14px,min(3.8vw,2.3vh),18px)] font-bold whitespace-nowrap text-white transition-transform duration-200 hover:-translate-y-0.5" style={{ width: wide ? `max(212px, calc(${bh} * 3.4308))` : "50%", filter: "drop-shadow(0 1.85px 1.6px rgba(79,112,71,0.024))" }}>
+              <button type="button" onClick={() => addToBasket("tomato", weight)} className="relative flex h-full items-center justify-center text-[clamp(14px,min(3.8vw,2.3vh),18px)] font-bold whitespace-nowrap text-white transition-transform duration-200 hover:-translate-y-0.5" style={{ width: wide ? `max(212px, calc(${bh} * 3.4308))` : "50%", filter: "drop-shadow(0 1.85px 1.6px rgba(79,112,71,0.024))" }}>
                 <Slant flip fill="#4f7047" />
                 <span className="relative -translate-x-[4%]">Add To Cart</span>
-              </a>
+              </button>
               <a href={WHATSAPP.href} className="relative flex h-full items-center justify-center text-[clamp(14px,min(3.8vw,2.3vh),18px)] font-bold whitespace-nowrap text-white transition-transform duration-200 hover:-translate-y-0.5" style={{ width: wide ? `max(212px, calc(${bh} * 3.4308))` : "calc(50% + 7px)", marginLeft: `calc(${bh} * -0.1077)`, filter: "drop-shadow(0 1.85px 1.6px rgba(68,68,68,0.024))" }}>
                 <Slant fill="#444" />
                 <span className="relative translate-x-[4%]">Order on WhatsApp</span>
@@ -205,7 +177,7 @@ export default function PixelHero() {
           <div className="flex flex-wrap items-center gap-[clamp(10px,1vw,14px)] px-[clamp(16px,1.9vw,27px)] py-[clamp(12px,2vh,18px)] lg:flex-nowrap">
             <div className="size-[clamp(64px,8.6vh,88px)] shrink-0 overflow-hidden rounded-full bg-[#c4c4c4] shadow-[0_4px_14px_rgba(0,0,0,0.25)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/img/p-tomato.jpg" alt="" className="size-full object-cover" />
+              <img src="/img/p-tomato.webp" alt="" className="size-full object-cover" />
             </div>
             <div className="min-w-0 flex-1 font-bold uppercase text-black">
               <p className="whitespace-nowrap text-[clamp(14px,1.25vw,20px)] leading-tight">Fresh tomato</p>
@@ -215,9 +187,9 @@ export default function PixelHero() {
               <p className="whitespace-nowrap text-[clamp(13px,1.15vw,20px)] leading-tight line-through">Rs. 150</p>
               <p className="whitespace-nowrap text-[clamp(20px,1.8vw,30px)] leading-tight">Rs. 120</p>
             </div>
-            <a href="#products" className="inline-flex h-[35px] shrink-0 items-center justify-center whitespace-nowrap rounded-full max-lg:basis-full lg:ml-[clamp(4px,1vw,14px)] bg-[#f4d98b] px-[14px] text-[11px] font-bold uppercase text-black hover:bg-[#efcd6a]">
+            <button type="button" onClick={() => addToBasket("tomato")} className="inline-flex h-[35px] shrink-0 items-center justify-center whitespace-nowrap rounded-full max-lg:basis-full lg:ml-[clamp(4px,1vw,14px)] bg-[#f4d98b] px-[14px] text-[11px] font-bold uppercase text-black hover:bg-[#efcd6a]">
               Add to cart
-            </a>
+            </button>
           </div>
         </div>
       </div>

@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { WHATSAPP, type Dictionary, type Locale } from "@/app/[lang]/dictionaries";
+import type { Dictionary, Locale } from "@/app/[lang]/dictionaries";
+import { PRODUCTS, addToBasket } from "@/lib/shop";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,8 +22,8 @@ const NEAR = 1.15; // the front photograph's size against the others
 const OPEN = 1.26; // and while its details are open
 
 const WORDS = {
-  en: { details: "View details", back: "Back", qty: "Quantity", total: "Total" },
-  ta: { details: "விவரங்களைப் பார்", back: "பின்செல்", qty: "அளவு", total: "மொத்தம்" },
+  en: { details: "View details", back: "Back", qty: "Quantity", total: "Total", added: "Added to basket" },
+  ta: { details: "விவரங்களைப் பார்", back: "பின்செல்", qty: "அளவு", total: "மொத்தம்", added: "கூடையில் சேர்க்கப்பட்டது" },
 };
 
 export default function SpecialWheel({ t, lang }: { t: Dictionary; lang: Locale }) {
@@ -42,6 +43,7 @@ export default function SpecialWheel({ t, lang }: { t: Dictionary; lang: Locale 
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
   const [dim, setDim] = useState({ w: 1440, h: 900 });
 
   // Layout (owner, 22 Nov: balanced, not too far and not too close). The page frame is the hero's: 6.25%
@@ -146,7 +148,12 @@ export default function SpecialWheel({ t, lang }: { t: Dictionary; lang: Locale 
   };
 
   const item = items[active];
-  const order = `${WHATSAPP.href}?text=${encodeURIComponent(`${p.order}: ${item.name} x${qty} (${item.tags[0]})`)}`;
+  // The wheel's four are the shop's first four products, in the same order (src/lib/shop.ts).
+  const add = () => {
+    addToBasket(PRODUCTS[active].id, open ? qty : 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1800);
+  };
   const btn = "inline-flex h-[clamp(48px,7vh,56px)] items-center justify-center rounded-[10px] px-7 text-[16px] font-bold transition-colors duration-200";
 
   return (
@@ -177,7 +184,7 @@ export default function SpecialWheel({ t, lang }: { t: Dictionary; lang: Locale 
               style={{ width: size, height: size, left: rim * Math.cos(a) - size / 2, top: rim * Math.sin(a) - size / 2 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={it.img} alt="" className="size-full object-cover" />
+              <img src={it.img} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
             </button>
           );
         })}
@@ -211,9 +218,9 @@ export default function SpecialWheel({ t, lang }: { t: Dictionary; lang: Locale 
               </p>
               <p className="mt-4 max-w-[38ch] text-[clamp(16px,1.15vw,19px)] leading-[1.55] text-[#505050]">{item.line}</p>
               <div className="mt-[clamp(16px,3.2vh,28px)] flex flex-wrap gap-3">
-                <a href={order} className={`${btn} bg-[#4f7047] text-white hover:bg-[#444]`}>
-                  {p.shop}
-                </a>
+                <button type="button" onClick={add} className={`${btn} bg-[#4f7047] text-white hover:bg-[#444]`}>
+                  {added ? `✓ ${w.added}` : p.add}
+                </button>
                 <button type="button" onClick={() => toggle(true)} className={`${btn} border border-[#444]/30 text-[#222] hover:bg-[#444] hover:text-white`}>
                   {w.details}
                 </button>
@@ -250,9 +257,9 @@ export default function SpecialWheel({ t, lang }: { t: Dictionary; lang: Locale 
                 </div>
               </div>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a href={order} className={`${btn} bg-[#4f7047] text-white hover:bg-[#444]`}>
-                  {p.shop}
-                </a>
+                <button type="button" onClick={add} className={`${btn} bg-[#4f7047] text-white hover:bg-[#444]`}>
+                  {added ? `✓ ${w.added}` : p.add}
+                </button>
                 <button type="button" onClick={() => toggle(false)} className={`${btn} border border-[#444]/30 text-[#222] hover:bg-[#444] hover:text-white`}>
                   {w.back}
                 </button>

@@ -26,7 +26,7 @@ export function Hero({ c }: { c: Content }) {
   // soft green panel with two real prices on the right, and photo shortcuts to the departments below.
   const price = (id: string) => c.shop.items.find((i) => i.id === id)!;
   const picks = [price("tomato"), price("kingcoconut")];
-  const dept: Record<string, string> = { veg: "/img/cat-vegetables.jpg", fruit: "/img/cat-fruits.jpg", green: "/img/cat-greens.jpg", coconut: "/img/cat-coconut.jpg", spice: "/img/cat-groceries.jpg" };
+  const dept: Record<string, string> = { veg: "/img/cat-vegetables.webp", fruit: "/img/cat-fruits.jpg", green: "/img/cat-greens.webp", coconut: "/img/cat-coconut.jpg", spice: "/img/cat-groceries.jpg" };
   const shortcuts = c.shop.cats.filter(([id]) => dept[id]);
   return (
     <header data-hero className="relative isolate flex min-h-svh flex-col bg-[#f4f1e8] text-night">
@@ -125,7 +125,7 @@ export function About({ c }: { c: Content }) {
       <div className="mt-16 overflow-hidden rounded-[28px] md:mt-24" data-reveal>
         <div className="aspect-[16/8] overflow-hidden bg-mist">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-pimg src="/img/banner-basket.jpg" alt="" loading="lazy" className="size-full scale-[1.15] object-cover" />
+          <img data-pimg src="/img/banner-basket.webp" alt="" loading="lazy" className="size-full scale-[1.15] object-cover" />
         </div>
       </div>
 

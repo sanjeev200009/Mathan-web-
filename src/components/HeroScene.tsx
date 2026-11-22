@@ -11,6 +11,7 @@ import SpecialWheel from "./SpecialWheel";
 import WhyChat from "./WhyChat";
 import FarmBanner from "./FarmBanner";
 import SiteFooter from "./SiteFooter";
+import ShopNav from "./ShopNav";
 
 gsap.registerPlugin(useGSAP);
 
@@ -30,7 +31,13 @@ export default function HeroScene({ t, lang }: { t: Dictionary; lang: Locale }) 
   useGSAP(
     () => {
       // "?nointro" in the address skips the opening scene (for checking the page quickly).
-      if (new URLSearchParams(window.location.search).has("nointro")) {
+      // The opening plays once per visit: coming back to the home page from the shop goes straight in.
+      let seen = false;
+      try {
+        seen = sessionStorage.getItem("pasumai-intro") === "1";
+        sessionStorage.setItem("pasumai-intro", "1");
+      } catch {}
+      if (seen || new URLSearchParams(window.location.search).has("nointro")) {
         setDone(true);
         return;
       }
@@ -56,7 +63,8 @@ export default function HeroScene({ t, lang }: { t: Dictionary; lang: Locale }) 
 
   if (done) return (
     <>
-      <PixelHero />
+      <ShopNav t={t} lang={lang} mode="float" />
+      <PixelHero t={t} lang={lang} />
       <VeggieBand labels={labels} />
       <SpecialWheel t={t} lang={lang} />
       <WhyChat lang={lang} />
@@ -70,7 +78,7 @@ export default function HeroScene({ t, lang }: { t: Dictionary; lang: Locale }) 
       {/* The owner's background: dewy grass on gentle hummocks under a white sky. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/img/bg-grass.jpg"
+        src="/img/bg-grass.webp"
         alt=""
         aria-hidden="true"
         width={1672}
@@ -99,7 +107,7 @@ export default function HeroScene({ t, lang }: { t: Dictionary; lang: Locale }) 
       </div>
 
       <div className="js-cover absolute inset-0 z-10 translate-y-full overflow-hidden bg-white">
-        <PixelHero />
+        <PixelHero t={t} lang={lang} />
         <VeggieBand labels={labels} />
       </div>
     </section>
